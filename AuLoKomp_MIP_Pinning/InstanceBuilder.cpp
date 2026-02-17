@@ -16,7 +16,12 @@ Instance InstanceBuilder::build(const std::vector<std::vector<int>>& grid) {
     StorageGrid storage_grid;
 
     const int max_height = static_cast<int>(grid.size());
-    const int max_width  = static_cast<int>(grid.back().size());
+    
+    // Find the maximum width across all rows (not just the last row!)
+    int max_width = 0;
+    for (const auto& row : grid) {
+        max_width = std::max(max_width, static_cast<int>(row.size()));
+    }
 
     // ------------------------------------------------------------------
     //  Phase 1: Walk the grid top-to-bottom, create UnitLoads, classify
