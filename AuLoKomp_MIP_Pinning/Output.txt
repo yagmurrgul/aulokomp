@@ -1,0 +1,69 @@
+Enter the txt filename: BS4_1_pinning_not_possible
+|_1_|_0_|_0_|_0_|_0_|_0_|
+|_0_|_0_|_0_|_0_|_0_|_0_|
+|_1_|_0_|_0_|_0_|_0_|_0_|
+|_0_|_0_|_0_|_0_|_0_|_0_|
+Set parameter Username
+Academic license - for non-commercial use only - expires 2025-02-15
+CONSTRAINT 2: EACH UL HAS TO BE RETRIEVED
+CONSTRAINT 4: UPDATING THE HEIGHT OF THE DYNAMIC STACKS
+CONSTRAINT 5: DEFINING K VALUE FOR EACH UL AND LEVEL
+CONSTRAINT 6: IF UL TAKEN AT A CYCLE,U HAS TO BE 1 FOR THAT CYCLE
+CONSTRAINT 7: EACH UL HAS TO BE IN EXACTLY ONE LEVEL IN EACH STAGE
+CONSTRAINT 8: CHECKING INFEASIBILITY FOR FIXED STACKS
+CONSTRAINT 9: CHECKING INFEASIBILITY FOR DYNAMIC STACKS
+CONSTRAINT 10: BATCHING STRATEGY 1
+CONSTRAINT 11: BATCHING STRATEGY 2
+CONSTRAINT 12: BATCHING STRATEGY 3
+CONSTRAINT 13 & 14: BATCHING STRATEGY 4
+CONSTRAINT 15: One of the batching strategies has to be selected, if i is retrieved
+CONSTRAINT 16: Exactly one box has to be the anchoring box in each cycle
+CONSTRAINT 17: Define energy
+Warning: constraint name "Height of dynamic stack 0at stage 0" has a space
+Warning: constraint name "Height of dynamic stack 0at stage 0" has a space
+Warning: default constraint names used to write mps file
+Gurobi Optimizer version 11.0.0 build v11.0.0rc2 (win64 - Windows 10.0 (19045.2))
+
+CPU model: 13th Gen Intel(R) Core(TM) i5-1345U, instruction set [SSE2|AVX|AVX2]
+Thread count: 10 physical cores, 12 logical processors, using up to 12 threads
+
+Optimize a model with 67 rows, 46 columns and 148 nonzeros
+Model fingerprint: 0x70af8b70
+Variable types: 4 continuous, 42 integer (42 binary)
+Coefficient statistics:
+  Matrix range     [1e+00, 4e+00]
+  Objective range  [1e+00, 1e+00]
+  Bounds range     [1e+00, 2e+01]
+  RHS range        [1e+00, 1e+03]
+Found heuristic solution: objective 2.0000000
+Presolve removed 67 rows and 46 columns
+Presolve time: 0.00s
+Presolve: All rows and columns removed
+
+Explored 0 nodes (0 simplex iterations) in 0.01 seconds (0.00 work units)
+Thread count was 1 (of 12 available processors)
+
+Solution count 1: 2
+
+Optimal solution found (tolerance 1.00e-04)
+Best objective 2.000000000000e+00, best bound 2.000000000000e+00, gap 0.0000%
+Optimal solution found!
+Model Name: BS4_1_pinning_not_possible
+x[0,1,1]: 1
+x[1,0,0]: 1
+y[0,1,1]: 1
+y[1,0,0]: 1
+z2[0,0,1]: 1
+z1[0,1,1]: 1
+z1[1,0,0]: 1
+u[0,0,0]: 1
+u[0,1,1]: 1
+u[1,0,0]: 1
+u[1,0,1]: 1
+h[0,0]: 4
+h[0,1]: 3
+e[0]: 2
+
+C:\Users\bbc7979\source\repos\AuLoKomp_MIP_Pinning\x64\Debug\AuLoKomp_MIP.exe (process 25232) exited with code 0 (0x0).
+To automatically close the console when debugging stops, enable Tools->Options->Debugging->Automatically close the console when debugging stops.
+Press any key to close this window . . .

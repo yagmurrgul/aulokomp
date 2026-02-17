@@ -1,0 +1,18 @@
+Instance: Instance_288
+|_0_|_0_|   |_0_|               
+|_0_|_1_|_0_|_1_|   |_0_|       
+|_0_|_0_|_1_|_0_|   |_0_|       
+|_0_|_0_|_0_|_0_|_0_|_0_|       
+|_0_|_0_|_0_|_0_|_0_|_1_|       
+|_0_|_0_|_1_|_0_|_0_|_0_|   |_0_|
+|_0_|_1_|_0_|_0_|_0_|_0_|_1_|_0_|
+|_0_|_0_|_1_|_1_|_0_|_0_|_1_|_0_|
+Heuristic total cost: 155
+Retrieve ULs {5, 7}, cost=5
+Retrieve ULs {34, 39}, cost=34
+Retrieve ULs {11}, cost=5
+Retrieve ULs {44}, cost=26
+Retrieve ULs {25}, cost=19
+Retrieve ULs {28}, cost=13
+Retrieve ULs {43}, cost=18
+Retrieve ULs {47}, cost=35
