@@ -43,8 +43,8 @@ int main() {
             Logger::Log("Instance: " + instance_name);
 
             TxtReader txt_reader(instance_name);
-            auto imported_text = txt_reader.importTextFile();
-            Instance instance = InstanceBuilder().instanceBuilder(imported_text);
+            auto grid = txt_reader.importTextFile();
+            Instance instance = InstanceBuilder::build(grid);
 
             if (use_mip) {
                 runMIP(instance_name, instance);

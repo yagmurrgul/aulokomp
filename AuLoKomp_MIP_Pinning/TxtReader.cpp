@@ -1,98 +1,84 @@
-#include <iostream>
-#include <filesystem>
-#include <fstream>
-#include <algorithm>
-#include <iterator>
-
 #include "TxtReader.h"
 #include "Logger.h"
-#include "utils.h"
-#include "Instance.h"
+#include <iostream>
+#include <fstream>
+#include <filesystem>
 
-
+namespace fs = std::filesystem;
 
 TxtReader::TxtReader(const std::string& filename) : _filename(filename) {}
 
-//Imports the text file and calls the function to convert it into an instance
 std::vector<std::vector<int>> TxtReader::importTextFile() {
-    _filename = "data\\" + _filename + ".txt";
-    std::vector<std::vector<int>> input_vector;
-    std::vector<int> row;
-    
-    std::ifstream input_file(_filename);
+    // Cross-platform path construction
+    fs::path filepath = fs::path("data") / (_filename + ".txt");
+
+    std::ifstream input_file(filepath);
     if (!input_file.is_open()) {
-        std::cerr << "Error opening file: " << _filename << std::endl;
-        //return -1;
+        std::cerr << "Error opening file: " << filepath << std::endl;
+        return {};
     }
 
+    std::vector<std::vector<int>> grid;
     std::string line;
-    int lines_count = 0;
     while (std::getline(input_file, line)) {
-        // Process each line as needed
-        //std::cout << line << std::endl;
         Logger::Log(line);
-        row = extractStorageGridContent(line);
-        input_vector.push_back(row);
-        ++lines_count;
-    }    
-    _importedText = input_vector;
-    _num_lines = lines_count;
-    input_file.close();
-    return input_vector;
+        grid.push_back(parseLine(line));
+    }
+    return grid;
 }
 
-//Extracts the input from the imported text and converts it into a vector of integers
-std::vector<int> TxtReader::extractStorageGridContent(std::string& line)
-{
-    std::vector<int> storage_grid_content;
-    string cap;
-    int empty_space_counter = 0;
+/// Parses one line of the visual grid format.
+///
+/// Format: cells are "|_<digit(s)>_|", separated by nothing when adjacent.
+/// Empty slots appear as runs of spaces (typically 4+ chars wide: "    ").
+/// Leading spaces before the first "|" also produce empty slots.
+///
+/// Example: "            |_1_|"       -> [-1, -1, -1, 1]
+///          "|_0_|_0_|_0_|   |_1_|"  -> [0, 0, 0, -1, 1]
+///
+std::vector<int> TxtReader::parseLine(const std::string& line) {
+    std::vector<int> row;
+    const size_t len = line.size();
+    size_t i = 0;
 
-    for (int i = 0; i < line.size(); i++)
-    {
-        if (line[i] == '|' && line[i + 1] == '_')
-        {
-            i = i + 1;
-        }
-        else if (line[i] == ' ')
-        {
-            empty_space_counter++;
-            i = i + 3;
-        }
-        else if (line[i] != '_')
-        {
-            cap = cap + line[i];
-        }
-        else
-        {
-            if (empty_space_counter > 0)
-            {
-                storage_grid_content.insert(storage_grid_content.end(), empty_space_counter, -1);
-                empty_space_counter = 0;
+    while (i < len) {
+        if (line[i] == '|') {
+            // Start of a cell: expect |_<digits>_|
+            // Skip the opening "|_"
+            i += 2; // past '|' and '_'
+
+            // Accumulate digit characters
+            std::string digits;
+            while (i < len && line[i] != '_') {
+                digits += line[i];
+                i++;
             }
+
+            // Skip the closing "_|"
+            if (i < len && line[i] == '_') i++; // '_'
+            if (i < len && line[i] == '|') i++; // '|'
+
+            // Parse the value
             try {
-                storage_grid_content.push_back(std::stoi(cap));
+                row.push_back(std::stoi(digits));
+            } catch (const std::exception& e) {
+                std::cerr << "Parse error in cell: '" << digits << "' -- " << e.what() << std::endl;
+                row.push_back(-1);
             }
-            catch (const std::invalid_argument& e) {
-                std::cout << e.what() << "\n";
+        }
+        else if (line[i] == ' ') {
+            // Empty slot: a run of spaces represents one missing cell.
+            // Consume all consecutive spaces.
+            while (i < len && line[i] == ' ') {
+                i++;
             }
-            catch (const std::out_of_range& e) {
-                std::cout << e.what() << "\n";
-            }
-            i = i + 2;
-            cap = "";
+            row.push_back(-1);
+        }
+        else {
+            // Unexpected character -- skip it
+            i++;
         }
     }
 
-    return storage_grid_content;
-}
-
-auto TxtReader::getNumLines() -> int
-{
-    return _num_lines;
-}
-
-auto TxtReader::setNumLines(int num_lines) -> void
-{
-    _num_lines = num_lines;
+    return row;
 }
