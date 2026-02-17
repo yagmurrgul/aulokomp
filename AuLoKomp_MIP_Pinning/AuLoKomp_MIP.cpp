@@ -5,19 +5,24 @@
 #include "InstanceBuilder.h"
 #include "Instance.h"
 #include "Heuristic.h"
-#include "Solver.h"
+#include "SolverBase.h"
+#include "PinningSolver.h"
+#include "NoPinningSolver.h"
 #include "FolderReader.h"
 #include <iostream>
 #include <string>
+#include <memory>
 #include <chrono>
 #include <filesystem>
 
 using namespace std;
 
+enum class SolveMode { Pinning, NoPinning, Heuristic };
+
 // ---------------------------------------------------------------------------
 //  Forward declarations
 // ---------------------------------------------------------------------------
-static void runMIP      (const string& filename, const Instance& instance);
+static void runMIP      (const string& filename, const Instance& instance, SolveMode mode);
 static void runHeuristic(const string& filename, const Instance& instance);
 
 // ---------------------------------------------------------------------------
@@ -26,8 +31,8 @@ static void runHeuristic(const string& filename, const Instance& instance);
 int main() {
     GlobalLogger::Init("./solution/combined_output.txt");
 
-    // Toggle: true = MIP, false = heuristic
-    const bool use_mip = true;
+    // Select solver mode
+    const SolveMode mode = SolveMode::Pinning;
 
     try {
         FolderReader reader("./data");
@@ -46,10 +51,10 @@ int main() {
             auto grid = txt_reader.importTextFile();
             Instance instance = InstanceBuilder::build(grid);
 
-            if (use_mip) {
-                runMIP(instance_name, instance);
-            } else {
+            if (mode == SolveMode::Heuristic) {
                 runHeuristic(instance_name, instance);
+            } else {
+                runMIP(instance_name, instance, mode);
             }
 
             Logger::Shutdown();
@@ -65,9 +70,9 @@ int main() {
 }
 
 // ---------------------------------------------------------------------------
-//  MIP solver runner
+//  MIP solver runner — selects pinning or non-pinning via polymorphism
 // ---------------------------------------------------------------------------
-static void runMIP(const string& filename, const Instance& instance) {
+static void runMIP(const string& filename, const Instance& instance, SolveMode mode) {
     try {
         GRBEnv env(true);
         env.set(GRB_IntParam_Threads, 1);
@@ -77,10 +82,21 @@ static void runMIP(const string& filename, const Instance& instance) {
         model.set(GRB_DoubleParam_TimeLimit, 600.0);
 
         GurobiSolution solution;
-        Solver solver(instance, model, env, solution, filename);
 
-        solver.createMIPwithPinning();
-        solver.solveAndSave();
+        unique_ptr<SolverBase> solver;
+        switch (mode) {
+            case SolveMode::Pinning:
+                solver = make_unique<PinningSolver>(instance, model, env, solution, filename);
+                break;
+            case SolveMode::NoPinning:
+                solver = make_unique<NoPinningSolver>(instance, model, env, solution, filename);
+                break;
+            default:
+                break;
+        }
+
+        solver->buildAndWrite();
+        solver->solveAndSave();
     }
     catch (GRBException& e) {
         cerr << "Gurobi Exception: " << e.getMessage() << endl;
