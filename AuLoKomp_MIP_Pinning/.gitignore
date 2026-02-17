@@ -67,3 +67,20 @@ venv/
 .DS_Store
 Thumbs.db
 desktop.ini
+
+# Instance data files - keep structure but ignore content changes
+data/*.txt
+!data/.gitkeep
+
+# Generated model files
+model/*.lp
+model/*.mps
+!model/.gitkeep
+
+# Generated solution files
+solution/*
+!solution/.gitkeep
+!solution/combined_output.txt
+
+# Zip archives
+*.zip
