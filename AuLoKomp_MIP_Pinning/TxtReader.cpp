@@ -30,11 +30,11 @@ std::vector<std::vector<int>> TxtReader::importTextFile() {
 /// Parses one line of the visual grid format.
 ///
 /// Format: cells are "|_<digit(s)>_|", separated by nothing when adjacent.
-/// Empty slots appear as runs of spaces (typically 4+ chars wide: "    ").
+/// Empty slots appear as runs of spaces (typically 4 chars per slot: "    ").
 /// Leading spaces before the first "|" also produce empty slots.
 ///
-/// Example: "            |_1_|"       -> [-1, -1, -1, 1]
-///          "|_0_|_0_|_0_|   |_1_|"  -> [0, 0, 0, -1, 1]
+/// Example: "            |_1_|"       -> [-1, -1, -1, 1]  (12 spaces = 3 slots)
+///          "|_0_|_0_|_0_|    |_1_|"  -> [0, 0, 0, -1, 1]  (4 spaces = 1 slot)
 ///
 std::vector<int> TxtReader::parseLine(const std::string& line) {
     std::vector<int> row;
@@ -67,12 +67,19 @@ std::vector<int> TxtReader::parseLine(const std::string& line) {
             }
         }
         else if (line[i] == ' ') {
-            // Empty slot: a run of spaces represents one missing cell.
-            // Consume all consecutive spaces.
+            // Empty slot: count consecutive spaces, each group of 4 = one slot.
+            // This matches the original logic: empty_space_counter++ with i += 3
+            size_t space_start = i;
             while (i < len && line[i] == ' ') {
                 i++;
             }
-            row.push_back(-1);
+            size_t num_spaces = i - space_start;
+            
+            // Each empty cell is represented by 4 spaces in the visual format
+            size_t num_empty_cells = (num_spaces + 3) / 4;  // Round up
+            for (size_t j = 0; j < num_empty_cells; j++) {
+                row.push_back(-1);
+            }
         }
         else {
             // Unexpected character -- skip it
